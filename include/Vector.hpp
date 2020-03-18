@@ -11,7 +11,8 @@ struct ProtoVector
 {
 public:
     Arithmetic data[dim];
-    ProtoVector(Arithmetic arr[dim]) {
+    ProtoVector(Arithmetic arr[dim])
+    {
         for (size_t i = 0; i < dim; i++)
         {
             this->data[i] = arr[i];
@@ -37,7 +38,8 @@ public:
         ProtoVector<Arithmetic, 3> rgb;
         ProtoVector<Arithmetic, 2> xy;
     };
-    ProtoVector(Arithmetic arr[4])  {
+    ProtoVector(Arithmetic arr[4])
+    {
         for (size_t i = 0; i < 4; i++)
         {
             this->data[i] = arr[i];
@@ -61,7 +63,8 @@ public:
         };
         ProtoVector<Arithmetic, 2> xy;
     };
-    ProtoVector(Arithmetic arr[3])  {
+    ProtoVector(Arithmetic arr[3])
+    {
         for (size_t i = 0; i < 3; i++)
         {
             this->data[i] = arr[i];
@@ -80,7 +83,8 @@ public:
             Arithmetic x, y;
         };
     };
-    ProtoVector(Arithmetic arr[2])  {
+    ProtoVector(Arithmetic arr[2])
+    {
         for (size_t i = 0; i < 2; i++)
         {
             this->data[i] = arr[i];
@@ -110,20 +114,32 @@ struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
     template <typename T, size_t n>
     friend std::ostream &operator<<(std::ostream &out, Vector<T, n> &vec);
 
-    Vector(Arithmetic arr[dim]): ProtoVector<Arithmetic, dim, isArithmetic>::ProtoVector(arr){};
+    Vector(Arithmetic arr[dim]) : ProtoVector<Arithmetic, dim, isArithmetic>::ProtoVector(arr){};
 };
 
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> add(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> add(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> sub(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> sub(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
 
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> mul(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> mul(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> div(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> div(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
 
 template <typename Arithmetic, size_t dim>
 Arithmetic dot(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
@@ -132,13 +148,26 @@ template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator+(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator+(Vector<Arithmetic, dim> lhs, Arithmetic &rhs);
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> lhs, Arithmetic &rhs);
 
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator*(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator*(Vector<Arithmetic, dim> lhs, Arithmetic &rhs);
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator/(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator/(Vector<Arithmetic, dim> lhs, Arithmetic &rhs);
+
 
 typedef Vector<int, 2> vec2i;
 typedef Vector<int, 3> vec3i;
@@ -158,7 +187,6 @@ vec4f Vec3f(float x, float y, float z, float w);
 
 // template <typename Arithmetic, size_t dim>
 // Vector<Arithmetic, dim> Vec(Arithmetic arr[dim]);
-
 
 } // namespace WarpMath
 
@@ -219,7 +247,7 @@ Vector<Arithmetic, dim> &Vector<Arithmetic, dim, isArithmetic>::operator/=(const
     return *this;
 }
 template <typename Arithmetic, size_t dim>
-std::ostream &operator<<(std::ostream &out,  Vector<Arithmetic, dim> &vec)
+std::ostream &operator<<(std::ostream &out, Vector<Arithmetic, dim> &vec)
 {
     out << "[";
     for (size_t i = 0; i < dim; i++)
@@ -280,9 +308,29 @@ Vector<Arithmetic, dim> add(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim>
 }
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> mul(Vector<Arithmetic, dim> lhs, Arithmetic rhs)
+{
+    for (size_t i = 0; i < dim; i++)
+    {
+        lhs.data[i] += rhs;
+    }
+    return lhs;
+}
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> sub(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs)
 {
     return lhs -= rhs;
+}
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> mul(Vector<Arithmetic, dim> lhs, Arithmetic rhs)
+{
+    for (size_t i = 0; i < dim; i++)
+    {
+        lhs.data[i] -= rhs;
+    }
+    return lhs;
 }
 
 template <typename Arithmetic, size_t dim>
@@ -292,9 +340,29 @@ Vector<Arithmetic, dim> mul(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim>
 }
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> mul(Vector<Arithmetic, dim> lhs, Arithmetic rhs)
+{
+    for (size_t i = 0; i < dim; i++)
+    {
+        lhs.data[i] *= rhs;
+    }
+    return lhs;
+}
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> div(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs)
 {
     return lhs /= rhs;
+}
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> mul(Vector<Arithmetic, dim> lhs, Arithmetic rhs)
+{
+    for (size_t i = 0; i < dim; i++)
+    {
+        lhs.data[i] /= rhs;
+    }
+    return lhs;
 }
 
 template <typename Arithmetic, size_t dim>
@@ -332,6 +400,31 @@ Vector<Arithmetic, dim> operator/(Vector<Arithmetic, dim> lhs, Vector<Arithmetic
     return div(lhs, rhs);
 }
 
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator+(Vector<Arithmetic, dim> lhs, Arithmetic &rhs)
+{
+    return add(lhs, rhs);
+}
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> lhs, Arithmetic &rhs)
+{
+    return sub(lhs, rhs);
+}
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator*(Vector<Arithmetic, dim> lhs, Arithmetic &rhs)
+{
+    return mul(lhs, rhs);
+}
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator/(Vector<Arithmetic, dim> lhs, Arithmetic &rhs)
+{
+    return div(lhs, rhs);
+}
+
+
 vec2i Vec2i(int x, int y)
 {
     int data[2] = {x, y};
@@ -367,7 +460,5 @@ vec4f Vec4f(float x, float y, float z, float w)
     float data[4] = {x, y, z, w};
     return Vector<float, 4>(data);
 }
-
-
 
 } // namespace WarpMath
