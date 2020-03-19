@@ -4,6 +4,13 @@
 #include <omp.h>
 #include <string>
 
+/*
+TODO:
+1. communitive scalar operation;
+2. overload int and float type conversion;
+3. dot product;
+4. norm;
+*/
 namespace WarpMath
 {
 template <typename Arithmetic, size_t dim,
@@ -178,10 +185,16 @@ template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator+(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator+(Arithmetic lhs, Vector<Arithmetic, dim> rhs);
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
 
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator-(Arithmetic lhs, Vector<Arithmetic, dim> rhs);
 
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> &lhs);
@@ -191,6 +204,9 @@ Vector<Arithmetic, dim> operator*(Vector<Arithmetic, dim> lhs, Vector<Arithmetic
 
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator*(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator*(Arithmetic lhs, Vector<Arithmetic, dim> rhs);
 
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator/(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
@@ -221,7 +237,7 @@ vec3f Vec3f(float x, float y, float z);
 vec4f Vec3f(float x, float y, float z, float w);
 
 template <typename Arithmetic, size_t dim>
-Vector<Arithmetic, dim> convert(ProtoVector<Arithmetic, dim> &proto);
+Vector<Arithmetic, dim> pvToVector(ProtoVector<Arithmetic, dim> &proto);
 // template <typename Arithmetic, size_t dim>
 // Vector<Arithmetic, dim> Vec(Arithmetic arr[dim]);
 
@@ -458,15 +474,33 @@ Vector<Arithmetic, dim> operator+(Vector<Arithmetic, dim> lhs, Arithmetic rhs)
 }
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator+(Arithmetic lhs, Vector<Arithmetic, dim> rhs)
+{
+    return add(rhs, lhs);
+}
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> lhs, Arithmetic rhs)
 {
     return sub(lhs, rhs);
 }
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator-(Arithmetic lhs, Vector<Arithmetic, dim> rhs)
+{
+    return -sub(rhs, lhs);
+}
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator*(Vector<Arithmetic, dim> lhs, Arithmetic rhs)
 {
     return mul(lhs, rhs);
+}
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator*(Arithmetic lhs, Vector<Arithmetic, dim> rhs)
+{
+    return mul(rhs, lhs);
 }
 
 template <typename Arithmetic, size_t dim>
@@ -628,7 +662,7 @@ bool operator==(const Vector<Arithmetic, dim> lhs, const Vector<Arithmetic, dim>
 }
 
 template <typename Arithmetic, size_t dim>
-Vector<Arithmetic, dim> convert(ProtoVector<Arithmetic, dim> &proto)
+Vector<Arithmetic, dim> pvToVector(ProtoVector<Arithmetic, dim> &proto)
 {
     Vector<Arithmetic, dim> result;
     for (size_t i = 0; i < dim; i++)

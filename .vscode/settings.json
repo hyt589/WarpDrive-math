@@ -3,6 +3,7 @@
     "files.associations": {
         "*.js": "javascript",
         "*.tcc": "cpp",
-        "limits": "cpp"
+        "limits": "cpp",
+        "regex": "cpp"
     }
 }

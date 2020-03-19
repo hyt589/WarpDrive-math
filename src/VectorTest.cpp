@@ -9,7 +9,7 @@ TEST_CASE("Vector initialization and templeate specialization", "[Vector]")
 {
 
     vec4f vec = Vector<float, 4>(new float[4]{1.0f, 2.0f, 3.0f, 4.0f});
-    vec3f vec_ijk = convert(vec.ijk);
+    vec3f vec_ijk = pvToVector(vec.ijk);
     vec3f ijk = Vec3f(2.0f, 3.0f, 4.0f);
     REQUIRE(vec.x == vec[0]);
     REQUIRE(vec[0] == 1.0f);
@@ -65,5 +65,13 @@ TEST_CASE("Vector-scalar operation"){
 }
 
 TEST_CASE("Vector type casting"){
+    //do stuff
+}
+
+TEST_CASE("Vector dot product"){
+    //do stuff
+}
+
+TEST_CASE("Vector cross product"){
     //do stuff
 }
