@@ -2,6 +2,7 @@
 #include <iostream>
 #include <type_traits>
 #include <omp.h>
+#include <string>
 
 namespace WarpMath
 {
@@ -18,6 +19,7 @@ public:
             this->data[i] = arr[i];
         }
     };
+    ProtoVector(){};
 };
 
 template <typename Arithmetic>
@@ -34,6 +36,15 @@ public:
         {
             Arithmetic r, g, b, a;
         };
+        struct
+        {
+            Arithmetic re, i, j, k; //notation for quaternions
+        };
+        struct
+        {
+            Arithmetic s;
+            ProtoVector<Arithmetic, 3> ijk;
+        };
         ProtoVector<Arithmetic, 3> xyz;
         ProtoVector<Arithmetic, 3> rgb;
         ProtoVector<Arithmetic, 2> xy;
@@ -45,6 +56,7 @@ public:
             this->data[i] = arr[i];
         }
     };
+    ProtoVector(){};
 };
 
 template <typename Arithmetic>
@@ -61,6 +73,10 @@ public:
         {
             Arithmetic r, g, b;
         };
+        struct
+        {
+            Arithmetic i, j, k;
+        };
         ProtoVector<Arithmetic, 2> xy;
     };
     ProtoVector(Arithmetic arr[3])
@@ -70,6 +86,7 @@ public:
             this->data[i] = arr[i];
         }
     };
+    ProtoVector(){};
 };
 
 template <typename Arithmetic>
@@ -90,6 +107,7 @@ public:
             this->data[i] = arr[i];
         }
     };
+    ProtoVector(){};
 };
 
 template <typename Arithmetic, size_t dim, typename isArithmetic = Arithmetic>
@@ -101,8 +119,9 @@ struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
     Vector<int, dim> toInt();
     Vector<float, dim> toFloat();
 
-    template <typename T>
-    typename std::enable_if<std::is_arithmetic<T>::value, T>::type toType();
+    template <typename T,
+    typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+    Vector<T, dim> toType();
 
     Vector<Arithmetic, dim> &operator+=(const Vector<Arithmetic, dim> &vec);
     Vector<Arithmetic, dim> &operator-=(const Vector<Arithmetic, dim> &vec);
@@ -116,10 +135,13 @@ struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
 
     Arithmetic operator[](const size_t index);
 
+    std::string toString();
+
     template <typename T, size_t n>
     friend std::ostream &operator<<(std::ostream &out, Vector<T, n> &vec);
 
     Vector(Arithmetic arr[dim]) : ProtoVector<Arithmetic, dim, isArithmetic>::ProtoVector(arr){};
+    Vector(){};
 };
 
 template <typename Arithmetic, size_t dim>
@@ -162,6 +184,9 @@ template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
 
 template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> &lhs);
+
+template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator*(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
 
 template <typename Arithmetic, size_t dim>
@@ -172,6 +197,12 @@ Vector<Arithmetic, dim> operator/(Vector<Arithmetic, dim> lhs, Vector<Arithmetic
 
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator/(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator/(Arithmetic lhs, Vector<Arithmetic, dim> rhs);
+
+template <typename Arithmetic, size_t dim>
+bool operator==(const Vector<Arithmetic, dim> lhs, const Vector<Arithmetic, dim> rhs);
 
 typedef Vector<int, 2> vec2i;
 typedef Vector<int, 3> vec3i;
@@ -189,6 +220,8 @@ vec2f Vec2f(float x, float y);
 vec3f Vec3f(float x, float y, float z);
 vec4f Vec3f(float x, float y, float z, float w);
 
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> convert(ProtoVector<Arithmetic, dim> &proto);
 // template <typename Arithmetic, size_t dim>
 // Vector<Arithmetic, dim> Vec(Arithmetic arr[dim]);
 
@@ -266,6 +299,20 @@ std::ostream &operator<<(std::ostream &out, Vector<Arithmetic, dim> &vec)
     return out;
 }
 
+template <typename Arithmetic, size_t dim, typename isArithmetic>
+std::string Vector<Arithmetic, dim, isArithmetic>::toString(){
+    std::string s = "[";
+    for (size_t i = 0; i < dim; i++)
+    {
+        s += std::to_string(this->data[i]);
+        if (i< dim-1)
+        {
+            s += ", ";
+        }
+    }
+    s += "]";
+    return s;
+}
 template <typename Arithmetic, size_t dim, typename isArithmetic>
 Arithmetic Vector<Arithmetic, dim, isArithmetic>::min()
 {
@@ -428,6 +475,28 @@ Vector<Arithmetic, dim> operator/(Vector<Arithmetic, dim> lhs, Arithmetic rhs)
     return div(lhs, rhs);
 }
 
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator/(Arithmetic lhs, Vector<Arithmetic, dim> rhs)
+{
+    Vector<Arithmetic, dim> result;
+    for (size_t i = 0; i < dim; i++)
+    {
+        result.data[i] = lhs/(rhs.data[i]);
+    }
+    return result;
+}
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> operator-(Vector<Arithmetic, dim> &lhs)
+{
+    Vector<Arithmetic, dim> result;
+    for (size_t i = 0; i < dim; i++)
+    {
+        result.data[i] = -(lhs.data[i]);
+    }
+    return result;
+}
+
 vec2i Vec2i(int x, int y)
 {
     int data[2] = {x, y};
@@ -506,6 +575,67 @@ Vector<Arithmetic, dim> &Vector<Arithmetic, dim, isArithmetic>::operator/=(const
     }
     
     return *this;
+}
+
+template <typename Arithmetic, size_t dim, typename isArithmetic>
+Vector<float, dim> Vector<Arithmetic, dim, isArithmetic>::toFloat(){
+    
+    Vector<float, dim> result;
+    for (size_t i = 0; i < dim; i++)
+    {
+        result.data[i] = (float)this->data[i];
+    }
+    return result;
+}
+
+template <typename Arithmetic, size_t dim, typename isArithmetic>
+Vector<int, dim> Vector<Arithmetic, dim, isArithmetic>::toInt(){
+    int arr[dim];
+    for (size_t i = 0; i < dim; i++)
+    {
+        arr[i] = (int)this->data[i];
+    }
+    Vector<int, dim> result;
+    result.data=arr;
+    return result;
+}
+
+template <typename Arithmetic, size_t dim, typename isArithmetic>
+template <typename T,
+    typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+Vector<T, dim> Vector<Arithmetic, dim, isArithmetic>::toType(){
+    T arr[dim];
+    for (size_t i = 0; i < dim; i++)
+    {
+        arr[i] = (T)this->data[i];
+    }
+    Vector<T, dim> result;
+    result.data=arr;
+    return result;
+}
+
+template <typename Arithmetic, size_t dim>
+bool operator==(const Vector<Arithmetic, dim> lhs, const Vector<Arithmetic, dim> rhs)
+{
+    for (size_t i = 0; i < dim; i++)
+    {
+        if (lhs.data[i] != rhs.data[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename Arithmetic, size_t dim>
+Vector<Arithmetic, dim> convert(ProtoVector<Arithmetic, dim> &proto)
+{
+    Vector<Arithmetic, dim> result;
+    for (size_t i = 0; i < dim; i++)
+    {
+        result.data[i] = proto.data[i];
+    }
+    return result;
 }
 
 } // namespace WarpMath
