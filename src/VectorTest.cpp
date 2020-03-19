@@ -58,14 +58,67 @@ TEST_CASE("Vector-Vector operations", "[Vector]")
         correctResult = 1.0f / correctResult;
         REQUIRE(result == correctResult);
     }
+
+    SECTION("Increment"){
+        vec4f result;
+        vec4f correctResult = Vec4f(11.2f, 3.5f, 3.1f, 6.3f);
+        for (size_t i = 0; i < 4; i++)
+        {
+            result.data[i] = vecL.data[i];
+        }
+        result += vecR;
+        REQUIRE(result == correctResult);
+    }
 }
 
 TEST_CASE("Vector-scalar operation"){
-    //do stuff
+    int scalar = 3;
+    vec3i v1 = Vec3i(5,2,7);
+
+    SECTION("Addition commutative"){
+        vec3i result = scalar + v1;
+        vec3i bench = Vec3i(5+3,2+3,7+3);
+        REQUIRE(result == bench);
+        result = v1 + scalar;
+        REQUIRE(result == bench);
+    }
+
+    SECTION("Subtraction not commutative"){
+        vec3i result = scalar - v1;
+        vec3i bench = Vec3i(3-5,3-2,3-7);
+        REQUIRE(result == bench);
+        result = v1 - scalar;
+        bench = -bench;
+        REQUIRE(result == bench);
+    }
+
+    SECTION("Multiplication commutative"){
+        vec3i result = scalar * v1;
+        vec3i bench = Vec3i(3*5,3*2,3*7);
+        REQUIRE(result == bench);
+        result = v1 * scalar;
+        REQUIRE(result == bench);
+    }
+
+    SECTION("Division not commutative"){
+        vec3i result = scalar / v1;
+        vec3i bench = Vec3i(3/5,3/2,3/7);
+        REQUIRE(result == bench);
+        result = v1 / scalar;
+        bench = Vec3i(5/3, 2/3, 7/3);
+        REQUIRE(result == bench);
+    }
 }
 
 TEST_CASE("Vector type casting"){
     //do stuff
+    vec4f floatVec = Vec4f(1.2f,3.4f,5.6f,7.8f);
+    vec4i intVec = Vec4i(1,3,5,7);
+    vec4f floatIntVec = Vec4f(1.0f,3.0f,5.0f,7.0f);
+    vec4i convertedIntVec = floatVec.toType<int>();
+    vec4f convertedFloatVec = intVec.toType<float>();
+    REQUIRE(convertedIntVec == intVec);
+    REQUIRE(convertedFloatVec == floatIntVec);
 }
 
 TEST_CASE("Vector dot product"){
