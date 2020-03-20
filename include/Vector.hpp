@@ -7,10 +7,7 @@
 
 /*
 TODO:
-1. communitive scalar operation;
-2. overload int and float type conversion;
-3. dot product;
-4. norm;
+1. cross product after matrix
 */
 namespace WarpDrive
 {
@@ -123,6 +120,7 @@ public:
 template <typename Arithmetic, size_t dim, typename isArithmetic = Arithmetic>
 struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
 {
+    // static_assert(dim > 1, "1-d Vectors are not allowed");
     Arithmetic sum();
     Arithmetic max();
     Arithmetic min();
@@ -130,6 +128,9 @@ struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
     Vector<float, dim> toFloat();
 
     Arithmetic dot(Vector<Arithmetic, dim> &vec);
+
+    template<size_t dim2>
+    auto cross(Vector<Arithmetic, dim2> &vec);
 
 
     template <typename T,
