@@ -15,6 +15,8 @@
 #define TEMP_matrix template <typename Arithmetic, size_t rows, size_t cols>
 #define TEMP_mat_mul template <size_t newCols>
 
+#define MAT_T Matrix<Arithmetic, rows, cols>
+
 /*
 TODO:
 * scalar operation
@@ -53,32 +55,28 @@ struct Matrix : public ProtoMatrix<Arithmetic, rows, cols, isArithmetic>
     auto colVectors();
     auto toString();
 
-    auto operator+=(Matrix<Arithmetic, rows, cols> &rhs); //return reference to this
-    auto operator-=(Matrix<Arithmetic, rows, cols> &rhs); //return reference to this
-    auto operator*=(Matrix<Arithmetic, rows, cols> &rhs); //return reference to this
-    auto operator/=(Matrix<Arithmetic, rows, cols> &rhs); //return reference to this
+    auto operator+=(MAT_T &rhs); //return reference to this
+    auto operator-=(MAT_T &rhs); //return reference to this
+    auto operator*=(MAT_T &rhs); //return reference to this
+    auto operator/=(MAT_T &rhs); //return reference to this
 
-    TEMP_mat_mul
-    auto mul(Matrix<Arithmetic, cols, newCols> &rhs);
+    TEMP_mat_mul auto mul(Matrix<Arithmetic, cols, newCols> &rhs);
 };
 
-template <typename Arithmetic, size_t rows, size_t cols = rows, typename isArithmetic = Arithmetic>
+template <typename Arithmetic, size_t rows, size_t cols = rows,
+          typename isArithmetic = Arithmetic>
 struct SquareMatrix : public Matrix<Arithmetic, rows, cols, isArithmetic>
 {
     static_assert(rows == cols, "SquareMatrix must have equal rows and cols!");
 };
 
-TEMP_matrix
-auto operator+(Matrix<Arithmetic, rows, cols> lhs, Matrix<Arithmetic, rows, cols> &rhs);
+TEMP_matrix auto operator+(MAT_T lhs, MAT_T &rhs);
 
-TEMP_matrix
-auto operator-(Matrix<Arithmetic, rows, cols> lhs, Matrix<Arithmetic, rows, cols> &rhs);
+TEMP_matrix auto operator-(MAT_T lhs, MAT_T &rhs);
 
-TEMP_matrix
-auto operator*(Matrix<Arithmetic, rows, cols> lhs, Matrix<Arithmetic, rows, cols> &rhs);
+TEMP_matrix auto operator*(MAT_T lhs, MAT_T &rhs);
 
-TEMP_matrix
-auto operator/(Matrix<Arithmetic, rows, cols> lhs, Matrix<Arithmetic, rows, cols> &rhs);
+TEMP_matrix auto operator/(MAT_T lhs, MAT_T &rhs);
 
 } // namespace Math
 
@@ -135,7 +133,7 @@ MAT_FUN(toString, ())
     return s;
 }
 
-MAT_FUN(operator+=,(Matrix<Arithmetic, rows, cols> &rhs))
+MAT_FUN(operator+=,(MAT_T &rhs))
 {
     for (size_t row = 0; row < rows; row++)
     {
@@ -147,7 +145,7 @@ MAT_FUN(operator+=,(Matrix<Arithmetic, rows, cols> &rhs))
     return *this;
 }
 
-MAT_FUN(operator-=,(Matrix<Arithmetic, rows, cols> &rhs))
+MAT_FUN(operator-=,(MAT_T &rhs))
 {
     for (size_t row = 0; row < rows; row++)
     {
@@ -159,7 +157,7 @@ MAT_FUN(operator-=,(Matrix<Arithmetic, rows, cols> &rhs))
     return *this;
 }
 
-MAT_FUN(operator/=,(Matrix<Arithmetic, rows, cols> &rhs))
+MAT_FUN(operator/=,(MAT_T &rhs))
 {
     for (size_t row = 0; row < rows; row++)
     {
@@ -171,7 +169,7 @@ MAT_FUN(operator/=,(Matrix<Arithmetic, rows, cols> &rhs))
     return *this;
 }
 
-MAT_FUN(operator*=,(Matrix<Arithmetic, rows, cols> &rhs))
+MAT_FUN(operator*=,(MAT_T &rhs))
 {
     for (size_t row = 0; row < rows; row++)
     {
@@ -183,7 +181,7 @@ MAT_FUN(operator*=,(Matrix<Arithmetic, rows, cols> &rhs))
     return *this;
 }
 
-MAT_TMP_FUN(mul, TEMP_mat_mul, (Matrix<Arithmetic, cols, newCols> &rhs))
+MAT_TMP_FUN(mul, TEMP_mat_mul, (Matrix<Arithmetic, cols, newCols> & rhs))
 {
     Matrix<Arithmetic, rows, newCols> result;
     for (size_t row = 0; row < rows; row++)
@@ -196,33 +194,31 @@ MAT_TMP_FUN(mul, TEMP_mat_mul, (Matrix<Arithmetic, cols, newCols> &rhs))
     return result;
 }
 
-TEMP_matrix
-auto operator+(Matrix<Arithmetic, rows, cols> lhs, Matrix<Arithmetic, rows, cols> &rhs)
+TEMP_matrix auto operator+(MAT_T lhs, MAT_T &rhs)
 {
-    return lhs += rhs
+    return lhs += rhs;
 }
 
-TEMP_matrix
-auto operator-(Matrix<Arithmetic, rows, cols> lhs, Matrix<Arithmetic, rows, cols> &rhs)
+TEMP_matrix auto
+operator-(MAT_T lhs, MAT_T &rhs)
 {
-    return lhs -= rhs
+    return lhs -= rhs;
 }
 
-TEMP_matrix
-auto operator*(Matrix<Arithmetic, rows, cols> lhs, Matrix<Arithmetic, rows, cols> &rhs)
+TEMP_matrix auto
+operator*(MAT_T lhs, MAT_T &rhs)
 {
-    return lhs *= rhs
+    return lhs *= rhs;
 }
 
-TEMP_matrix
-auto operator/(Matrix<Arithmetic, rows, cols> lhs, Matrix<Arithmetic, rows, cols> &rhs)
+TEMP_matrix auto
+operator/(MAT_T lhs, MAT_T &rhs)
 {
-    return lhs /= rhs
+    return lhs /= rhs;
 }
-
 
 template <typename Arithmetic, size_t dim, typename isArithmetic>
-template<size_t dim2>
+template <size_t dim2>
 auto Vector<Arithmetic, dim, isArithmetic>::cross(Vector<Arithmetic, dim2> &vec)
 {
     Matrix<Arithmetic, dim, 1> lhs;
@@ -247,3 +243,4 @@ auto Vector<Arithmetic, dim, isArithmetic>::cross(Vector<Arithmetic, dim2> &vec)
 #undef VEC
 #undef TEMP_matrix
 #undef TEMP_mat_mul
+#undef MAT_T
