@@ -3,7 +3,7 @@
 #include "catch.hpp"
 #include "WarpMath.hpp"
 
-using namespace WarpMath;
+using namespace WarpDrive::Math;
 
 TEST_CASE("Vector initialization and templeate specialization", "[Vector]")
 {
@@ -123,8 +123,29 @@ TEST_CASE("Vector type casting"){
 
 TEST_CASE("Vector dot product"){
     //do stuff
+    vec4f vec1 = Vec4f(1.2f,3.4f,5.6f,7.8f);
+    vec4f vec2 = Vec4f(8.7f,6.5f,4.3f,2.1f);
+    float bench = 1.2f*8.7f + 3.4f*6.5f + 5.6f*4.3f + 7.8f*2.1f;
+    float result = vec1.dot(vec2);
+    REQUIRE(result == bench);
+    result = vec2.dot(vec1);
+    REQUIRE(result == bench);
+}
+
+TEST_CASE("Vector norm"){
+    vec4i vec = Vec4i(1,2,3,4);
+    float bench = sqrt(1.0f*1.0f+2.0f*2.0f+3.0f*3.0f+4.0f*4.0f);
+    REQUIRE(vec.norm() == bench);
+}
+
+TEST_CASE("Dimensional operation"){
+    vec4f vec = Vec4f(5.2f,3.2f,-4.4f,6.5f);
+    REQUIRE(vec.min() == vec.z);
+    REQUIRE(vec.max() == vec.w);
+    REQUIRE(vec.sum() == (vec.x + vec.y + vec.z + vec.w));
 }
 
 TEST_CASE("Vector cross product"){
     //do stuff
+    REQUIRE(false);
 }

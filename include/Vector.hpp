@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <omp.h>
 #include <string>
+#include <math.h>
 
 /*
 TODO:
@@ -11,7 +12,9 @@ TODO:
 3. dot product;
 4. norm;
 */
-namespace WarpMath
+namespace WarpDrive
+{
+namespace Math
 {
 template <typename Arithmetic, size_t dim,
           typename = typename std::enable_if<std::is_arithmetic<Arithmetic>::value, Arithmetic>::type>
@@ -126,6 +129,9 @@ struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
     Vector<int, dim> toInt();
     Vector<float, dim> toFloat();
 
+    Arithmetic dot(Vector<Arithmetic, dim> &vec);
+
+
     template <typename T,
               typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
     Vector<T, dim> toType();
@@ -141,6 +147,8 @@ struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
     Vector<Arithmetic, dim> &operator/=(const Arithmetic scalar);
 
     Arithmetic operator[](const size_t index);
+
+    float norm();
 
     std::string toString();
 
@@ -176,7 +184,7 @@ template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> div(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
 
 template <typename Arithmetic, size_t dim>
-Arithmetic dot(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
+Arithmetic dot(Vector<Arithmetic, dim> &lhs, Vector<Arithmetic, dim> &rhs);
 
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator+(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs);
@@ -241,10 +249,10 @@ Vector<Arithmetic, dim> pvToVector(ProtoVector<Arithmetic, dim> &proto);
 // template <typename Arithmetic, size_t dim>
 // Vector<Arithmetic, dim> Vec(Arithmetic arr[dim]);
 
-} // namespace WarpMath
+} // namespace Math
 
 //implmentation below
-namespace WarpMath
+namespace Math
 {
 
 template <typename Arithmetic, size_t dim, typename isArithmetic>
@@ -434,7 +442,7 @@ Vector<Arithmetic, dim> div(Vector<Arithmetic, dim> lhs, Arithmetic rhs)
 }
 
 template <typename Arithmetic, size_t dim>
-Arithmetic dot(Vector<Arithmetic, dim> lhs, Vector<Arithmetic, dim> &rhs)
+Arithmetic dot(Vector<Arithmetic, dim> &lhs, Vector<Arithmetic, dim> &rhs)
 {
     Arithmetic result = 0;
     for (size_t i = 0; i < dim; i++)
@@ -669,4 +677,24 @@ Vector<T, dim> Vector<Arithmetic, dim, isArithmetic>::toType()
     return result;
 }
 
-} // namespace WarpMath
+template <typename Arithmetic, size_t dim, typename isArithmetic>
+Arithmetic Vector<Arithmetic, dim, isArithmetic>::dot(Vector<Arithmetic, dim> &vec)
+{
+    return WarpDrive::Math::dot(*this, vec);
+}
+
+template <typename Arithmetic, size_t dim, typename isArithmetic>
+float Vector<Arithmetic, dim, isArithmetic>::norm()
+{
+    Vector<float, dim> floatVec = this->toFloat();
+    float result = 0.0f;
+    for (size_t i = 0; i < dim; i++)
+    {
+        result += floatVec.data[i] * floatVec.data[i];
+    }
+    result = sqrt(result);
+    return result;
+}
+
+} // namespace Math
+} // namespace WarpDirve
