@@ -154,7 +154,7 @@ struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
     std::string toString();
 
     template <typename T, size_t n>
-    friend std::ostream &operator<<(std::ostream &out, Vector<T, n> &vec);
+    friend std::ostream &operator<<(std::ostream &out, Vector<T, n> vec);
 
     Vector(Arithmetic arr[dim]) : ProtoVector<Arithmetic, dim, isArithmetic>::ProtoVector(arr){};
     Vector(){};
@@ -309,7 +309,7 @@ Vector<Arithmetic, dim> &Vector<Arithmetic, dim, isArithmetic>::operator/=(const
     return *this;
 }
 template <typename Arithmetic, size_t dim>
-std::ostream &operator<<(std::ostream &out, Vector<Arithmetic, dim> &vec)
+std::ostream &operator<<(std::ostream &out, Vector<Arithmetic, dim> vec)
 {
     out << "[";
     for (size_t i = 0; i < dim; i++)

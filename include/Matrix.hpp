@@ -26,7 +26,6 @@ TODO:
 * scalar operation
 * [done] element-wise operations; 
 * [done] matrix multiplication; 
-* matrix scalar multiplication;
 * matrix vector multiplication; 
 * [done] determinant;
 * transpose;
@@ -57,7 +56,7 @@ struct Matrix : public ProtoMatrix<Arithmetic, rows, cols, isArithmetic>
 {
     static_assert(rows >= 1 && cols >= 1, "Matrix size must be larger that 1x1");
     Matrix(){};
-    auto colVectors();
+    auto colVector(int col);
     auto toString();
 
     auto determinant();
@@ -94,23 +93,14 @@ TEMP_matrix auto operator/(MAT_T lhs, MAT_T &rhs);
 namespace Math
 {
 
-MAT_FUN(colVectors, ())
+MAT_FUN(colVector, (int col))
 {
-    VEC(rows) *colVecArr = new VEC(rows)[cols];
-    for (size_t i = 0; i < cols; i++)
-    {
-        VEC(rows) *vec = new VEC(rows)();
-        colVecArr[i] = *vec;
-    }
-
+    std::unique_ptr<VEC(rows)> vec = std::make_unique<VEC(rows)>();
     for (size_t row = 0; row < rows; row++)
     {
-        for (size_t col = 0; col < cols; col++)
-        {
-            colVecArr[col].data[row] = this->arr[row][col];
-        }
+        vec.get()->data[row] = this->arr[row][col];
     }
-    return colVecArr;
+    return *(vec.get());
 }
 
 MAT_FUN(toString, ())

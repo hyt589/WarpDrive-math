@@ -173,6 +173,7 @@ int main(int argc, char const *argv[])
     mat1.arr[2][1] = 8;
     mat1.arr[2][2] = 8;
     
-    std::cout << mat1.determinant();
+    std::cout << mat1.toString()<< "\n";
+    std::cout << (mat1.colVector(0));
     return 0;
 }
