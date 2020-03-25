@@ -129,9 +129,8 @@ struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
 
     Arithmetic dot(Vector<Arithmetic, dim> &vec);
 
-    template<size_t dim2>
-    auto cross(Vector<Arithmetic, dim2> &vec);
-
+    template <size_t dim2>
+    auto rowTimesCol(Vector<Arithmetic, dim2> &vec);
 
     template <typename T,
               typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
@@ -146,6 +145,12 @@ struct Vector : public ProtoVector<Arithmetic, dim, isArithmetic>
     Vector<Arithmetic, dim> &operator-=(const Arithmetic scalar);
     Vector<Arithmetic, dim> &operator*=(const Arithmetic scalar);
     Vector<Arithmetic, dim> &operator/=(const Arithmetic scalar);
+
+    Vector<Arithmetic, dim> &operator=(const Arithmetic *arr);
+    Vector<Arithmetic, dim> &operator=(const Vector<Arithmetic, dim> &val);
+
+    template <size_t length>
+    Vector<Arithmetic, length> subVector(size_t start);
 
     Arithmetic operator[](const size_t index);
 
@@ -250,6 +255,9 @@ Vector<Arithmetic, dim> pvToVector(ProtoVector<Arithmetic, dim> &proto);
 // template <typename Arithmetic, size_t dim>
 // Vector<Arithmetic, dim> Vec(Arithmetic arr[dim]);
 
+template<typename T>
+Vector<T, 3> cross(Vector<T,3> a, Vector<T, 3> b);
+
 } // namespace Math
 
 //implmentation below
@@ -308,6 +316,45 @@ Vector<Arithmetic, dim> &Vector<Arithmetic, dim, isArithmetic>::operator/=(const
     }
     return *this;
 }
+
+template <typename Arithmetic, size_t dim, typename isArithmetic>
+Vector<Arithmetic, dim> &Vector<Arithmetic, dim, isArithmetic>::operator=(const Arithmetic *arr)
+{
+    for (size_t i = 0; i < dim; i++)
+    {
+        this->data[i] = arr[i];
+    }
+
+    return *this;
+}
+
+template <typename Arithmetic, size_t dim, typename isArithmetic>
+Vector<Arithmetic, dim> &Vector<Arithmetic, dim, isArithmetic>::operator=(const Vector<Arithmetic, dim> &vec)
+{
+    *this = vec.data;
+    return *this;
+}
+
+template <typename Arithmetic, size_t dim, typename isArithmetic>
+template <size_t length>
+Vector<Arithmetic, length> Vector<Arithmetic, dim, isArithmetic>::subVector(size_t start)
+{
+    if (0 <= start && start + length <= dim && length > 0)
+    {
+        Vector<Arithmetic, length> result;
+        for (size_t i = 0; i < length; i++)
+        {
+            result.data[i] = this->data[start + i];
+        }
+        
+        return result;
+    }else
+    {
+        throw "Index out of bounds";
+    }
+    
+}
+
 template <typename Arithmetic, size_t dim>
 std::ostream &operator<<(std::ostream &out, Vector<Arithmetic, dim> vec)
 {
@@ -649,7 +696,7 @@ bool operator==(const Vector<Arithmetic, dim1> lhs, const Vector<Arithmetic, dim
     {
         return false;
     }
-    
+
     for (size_t i = 0; i < dim1; i++)
     {
         if (lhs.data[i] != rhs.data[i])
@@ -702,5 +749,15 @@ float Vector<Arithmetic, dim, isArithmetic>::norm()
     return result;
 }
 
+template<typename T>
+Vector<T, 3> cross(Vector<T,3> a, Vector<T, 3> b)
+{
+    Vector<T, 3> c;
+    c.x = a.y * b.z - a.z * b.y;
+    c.y = a.z * b.x - a.x * b.z;
+    c.z = a.x * b.y - a.y * b.x;
+    return c;
+}
+
 } // namespace Math
-} // namespace WarpDirve
+} // namespace WarpDrive

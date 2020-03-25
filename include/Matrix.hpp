@@ -28,7 +28,7 @@ TODO:
 * [done] matrix multiplication; 
 * matrix vector multiplication; 
 * [done] determinant;
-* transpose;
+* [done] transpose;
 * inverse;
 * translation, rotation, and projection matrix generation functions;
 */
@@ -251,7 +251,8 @@ MAT_TMP_FUN(mul, TEMP_mat_mul, (Matrix<Arithmetic, cols, newCols> & rhs))
     {
         for (size_t col = 0; col < newCols; col++)
         {
-            result.arr[row][col] = ((this->rowVectors[row]) * (rhs.colVectors()[col])).sum();
+            auto rvec = rhs.colVector(col);
+            result.arr[row][col] = ((this->rowVectors[row]) * rvec).sum();
         }
     }
     return result;
@@ -282,7 +283,7 @@ operator/(MAT_T lhs, MAT_T &rhs)
 
 template <typename Arithmetic, size_t dim, typename isArithmetic>
 template <size_t dim2>
-auto Vector<Arithmetic, dim, isArithmetic>::cross(Vector<Arithmetic, dim2> &vec)
+auto Vector<Arithmetic, dim, isArithmetic>::rowTimesCol(Vector<Arithmetic, dim2> &vec)
 {
     Matrix<Arithmetic, dim, 1> lhs;
     Matrix<Arithmetic, 1, dim2> rhs;

@@ -173,8 +173,10 @@ int main(int argc, char const *argv[])
     mat1.arr[2][1] = 8;
     mat1.arr[2][2] = 8;
     
-    std::cout << mat1.toString()<< "\n";
-    std::cout << (mat1.colVector(0));
-    std::cout << mat1.transpose().toString()<< "\n";
+    vec3f v1 = Vec3f(1.0f, 0.0f, 0.0f);
+    vec3f v2 = Vec3f(0.0f, 1.0f, 0.0f);
+    vec3f v3 = cross(v1,v2);
+    std::cout << v3;
+    
     return 0;
 }
