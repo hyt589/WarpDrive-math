@@ -28,7 +28,7 @@ TODO:
 * [done] matrix multiplication; 
 * matrix scalar multiplication;
 * matrix vector multiplication; 
-* determinant;
+* [done] determinant;
 * transpose;
 * inverse;
 * translation, rotation, and projection matrix generation functions;
