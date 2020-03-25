@@ -162,17 +162,17 @@ using namespace WarpDrive::Math;
 // }
 int main(int argc, char const *argv[])
 {
-    Matrix<int, 2, 2> mat1;
+    Matrix<int, 3, 3> mat1;
     mat1.arr[0][0] = 1;
     mat1.arr[0][1] = 2;
-    mat1.arr[1][0] = 3;
-    mat1.arr[1][1] = 4;
-    Matrix<int, 2, 1> mat2;
-    mat2.arr[0][0] = 1;
-    mat2.arr[1][0] = 2;
-    std::cout << mat1.toString() << "\n";
-    std::cout << mat2.toString() << "\n";
-    auto mat3 = mat1.mul(mat2);
-    std::cout << mat3.toString() << "\n";
+    mat1.arr[0][2] = 3;
+    mat1.arr[1][0] = 4;
+    mat1.arr[1][1] = 5;
+    mat1.arr[1][2] = 6;
+    mat1.arr[2][0] = 7;
+    mat1.arr[2][1] = 8;
+    mat1.arr[2][2] = 8;
+    
+    std::cout << mat1.determinant();
     return 0;
 }

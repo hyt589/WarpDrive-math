@@ -6,6 +6,10 @@
     template <typename Arithmetic, size_t rows, size_t cols, typename isArithmetic> \
     auto Matrix<Arithmetic, rows, cols, isArithmetic>::FUN_NAME __VA_ARGS__
 
+#define SQ_MAT_FUN(FUN_NAME, ...)                                                   \
+    template <typename Arithmetic, size_t rows, size_t cols, typename isArithmetic> \
+    auto SquareMatrix<Arithmetic, rows, cols, isArithmetic>::FUN_NAME __VA_ARGS__
+
 #define MAT_TMP_FUN(FUN_NAME, TMP, ...)                                             \
     template <typename Arithmetic, size_t rows, size_t cols, typename isArithmetic> \
     TMP auto Matrix<Arithmetic, rows, cols, isArithmetic>::FUN_NAME __VA_ARGS__
@@ -22,6 +26,7 @@ TODO:
 * scalar operation
 * [done] element-wise operations; 
 * [done] matrix multiplication; 
+* matrix scalar multiplication;
 * matrix vector multiplication; 
 * determinant;
 * transpose;
@@ -50,22 +55,25 @@ struct ProtoMatrix
 template <typename Arithmetic, size_t rows, size_t cols, typename isArithmetic = Arithmetic>
 struct Matrix : public ProtoMatrix<Arithmetic, rows, cols, isArithmetic>
 {
-    static_assert(rows > 1 || cols > 1, "1x1 matrices are not allowed");
+    static_assert(rows >= 1 && cols >= 1, "Matrix size must be larger that 1x1");
     Matrix(){};
     auto colVectors();
     auto toString();
+
+    auto determinant();
 
     auto operator+=(MAT_T &rhs); //return reference to this
     auto operator-=(MAT_T &rhs); //return reference to this
     auto operator*=(MAT_T &rhs); //return reference to this
     auto operator/=(MAT_T &rhs); //return reference to this
+    auto operator[](int i);
 
     TEMP_mat_mul auto mul(Matrix<Arithmetic, cols, newCols> &rhs);
 };
 
 template <typename Arithmetic, size_t rows, size_t cols = rows,
           typename isArithmetic = Arithmetic>
-struct SquareMatrix : public Matrix<Arithmetic, rows, cols, isArithmetic>
+struct SquareMatrix : Matrix<Arithmetic, rows, cols, isArithmetic>
 {
     static_assert(rows == cols, "SquareMatrix must have equal rows and cols!");
 };
@@ -133,6 +141,55 @@ MAT_FUN(toString, ())
     return s;
 }
 
+
+//private helper function to perform LU decomposition
+template <typename T, size_t n>
+static void LUdecomposition(T a[n][n], T l[n][n], T u[n][n]) {
+   int i = 0, j = 0, k = 0;
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < n; j++) {
+         if (j < i)
+         l[j][i] = 0;
+         else {
+            l[j][i] = a[j][i];
+            for (k = 0; k < i; k++) {
+               l[j][i] = l[j][i] - l[j][k] * u[k][i];
+            }
+         }
+      }
+      for (j = 0; j < n; j++) {
+         if (j < i)
+            u[i][j] = 0;
+         else if (j == i)
+            u[i][j] = 1;
+         else {
+            u[i][j] = a[i][j] / l[i][i];
+            for (k = 0; k < i; k++) {
+               u[i][j] = u[i][j] - ((l[i][k] * u[k][j]) / l[i][i]);
+            }
+         }
+      }
+   }
+}
+
+MAT_FUN(determinant, ())
+{
+    static_assert(rows == cols, "Determinant for non square matrices is not defined");
+    Arithmetic l[cols][cols];
+    Arithmetic u[cols][cols];
+
+    LUdecomposition(this->arr,l,u);
+    Arithmetic detL = 1;
+    Arithmetic detU = 1;
+    for (size_t i = 0; i < cols; i++)
+    {
+        detL *= l[i][i];
+        detU *= u[i][i];
+    }
+    return detL * detU;
+}
+
+
 MAT_FUN(operator+=,(MAT_T &rhs))
 {
     for (size_t row = 0; row < rows; row++)
@@ -179,6 +236,11 @@ MAT_FUN(operator*=,(MAT_T &rhs))
         }
     }
     return *this;
+}
+
+MAT_FUN(operator[],(int i))
+{
+    return this->rowVectors[i];
 }
 
 MAT_TMP_FUN(mul, TEMP_mat_mul, (Matrix<Arithmetic, cols, newCols> & rhs))
