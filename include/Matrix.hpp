@@ -60,6 +60,7 @@ struct Matrix : public ProtoMatrix<Arithmetic, rows, cols, isArithmetic>
     auto toString();
 
     auto determinant();
+    auto transpose();
 
     auto operator+=(MAT_T &rhs); //return reference to this
     auto operator-=(MAT_T &rhs); //return reference to this
@@ -177,6 +178,16 @@ MAT_FUN(determinant, ())
         detU *= u[i][i];
     }
     return detL * detU;
+}
+
+MAT_FUN(transpose, ())
+{
+    Matrix<Arithmetic, cols, rows> result;
+    for (size_t row = 0; row < cols; row++)
+    {
+        result.rowVectors[row] = this->colVector(row);
+    }
+    return result;
 }
 
 

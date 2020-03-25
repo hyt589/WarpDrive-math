@@ -226,8 +226,8 @@ Vector<Arithmetic, dim> operator/(Vector<Arithmetic, dim> lhs, Arithmetic rhs);
 template <typename Arithmetic, size_t dim>
 Vector<Arithmetic, dim> operator/(Arithmetic lhs, Vector<Arithmetic, dim> rhs);
 
-template <typename Arithmetic, size_t dim>
-bool operator==(const Vector<Arithmetic, dim> lhs, const Vector<Arithmetic, dim> rhs);
+template <typename Arithmetic, size_t dim1, size_t dim2>
+bool operator==(const Vector<Arithmetic, dim1> lhs, const Vector<Arithmetic, dim2> rhs);
 
 typedef Vector<int, 2> vec2i;
 typedef Vector<int, 3> vec3i;
@@ -642,10 +642,15 @@ Vector<int, dim> Vector<Arithmetic, dim, isArithmetic>::toInt()
     return result;
 }
 
-template <typename Arithmetic, size_t dim>
-bool operator==(const Vector<Arithmetic, dim> lhs, const Vector<Arithmetic, dim> rhs)
+template <typename Arithmetic, size_t dim1, size_t dim2>
+bool operator==(const Vector<Arithmetic, dim1> lhs, const Vector<Arithmetic, dim2> rhs)
 {
-    for (size_t i = 0; i < dim; i++)
+    if (dim1 != dim2)
+    {
+        return false;
+    }
+    
+    for (size_t i = 0; i < dim1; i++)
     {
         if (lhs.data[i] != rhs.data[i])
         {

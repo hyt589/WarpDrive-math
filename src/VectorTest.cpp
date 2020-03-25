@@ -175,5 +175,6 @@ int main(int argc, char const *argv[])
     
     std::cout << mat1.toString()<< "\n";
     std::cout << (mat1.colVector(0));
+    std::cout << mat1.transpose().toString()<< "\n";
     return 0;
 }
