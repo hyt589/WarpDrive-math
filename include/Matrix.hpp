@@ -45,7 +45,8 @@ struct ProtoMatrix
     };
 
     ProtoMatrix(){};
-    ProtoMatrix(Arithmetic data[rows][cols]){
+    ProtoMatrix(Arithmetic data[rows][cols])
+    {
         for (size_t row = 0; row < rows; row++)
         {
             for (size_t col = 0; col < cols; col++)
@@ -61,7 +62,7 @@ struct Matrix : public ProtoMatrix<Arithmetic, rows, cols, isArithmetic>
 {
     static_assert(rows >= 1 && cols >= 1, "Matrix size must be larger that 1x1");
     Matrix(){};
-    Matrix(Arithmetic data[rows][cols]) : ProtoMatrix<Arithmetic, rows, cols, isArithmetic>(data) {};
+    Matrix(Arithmetic data[rows][cols]) : ProtoMatrix<Arithmetic, rows, cols, isArithmetic>(data){};
     auto colVector(int col);
     auto toString();
 
@@ -90,9 +91,14 @@ struct Matrix : public ProtoMatrix<Arithmetic, rows, cols, isArithmetic>
 
     auto operator[](int i);
 
-
     TEMP_mat_mul auto mul(Matrix<Arithmetic, cols, newCols> &rhs);
     auto mul(Vector<Arithmetic, cols> &rhs);
+
+    auto cof(size_t p, size_t q);
+    auto adjoint();
+    auto inverse();
+
+    auto toFloat();
 };
 
 template <typename Arithmetic, size_t rows, size_t cols = rows,
@@ -380,80 +386,162 @@ MAT_TMP_FUN(mul, TEMP_mat_mul, (Matrix<Arithmetic, cols, newCols> & rhs))
     return result;
 }
 
-MAT_FUN(mul, (Vector<Arithmetic, cols> &rhs ))
+MAT_FUN(mul, (Vector<Arithmetic, cols> & rhs))
 {
     Matrix<Arithmetic, cols, 1> rmatrix;
     for (size_t i = 0; i < cols; i++)
     {
         rmatrix.arr[0][i] = rhs.data[i];
     }
-    
+
     return this->mul(rmatrix);
 }
 
-
 TEMP_matrix auto operator+(MAT_T lhs, MAT_T &rhs)
 {
-    return lhs += rhs;
+    MAT_T result;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            result.arr[row][col] = lhs.arr[row][col] + rhs.arr[row][col];
+        }
+    }
+    return result;
 }
 
 TEMP_matrix auto operator+(MAT_T lhs, Arithmetic rhs)
 {
-    return lhs += rhs;
+    MAT_T result;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            result.arr[row][col] = lhs.arr[row][col] + rhs;
+        }
+    }
+    return result;
 }
 
 TEMP_matrix auto operator+(MAT_T lhs, Vector<Arithmetic, cols> &rhs)
 {
-    return lhs += rhs;
+    MAT_T result;
+    for (size_t i = 0; i < rows; i++)
+    {
+        result.rowVectors[i] = lhs.rowVectors[i] + rhs;
+    }
+    return result;
 }
-
 
 TEMP_matrix auto
 operator-(MAT_T lhs, MAT_T &rhs)
 {
-    return lhs -= rhs;
+    MAT_T result;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            result.arr[row][col] = lhs.arr[row][col] - rhs.arr[row][col];
+        }
+    }
+    return result;
 }
 
 TEMP_matrix auto operator-(MAT_T lhs, Arithmetic rhs)
 {
-    return lhs -= rhs;
+    MAT_T result;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            result.arr[row][col] = lhs.arr[row][col] - rhs;
+        }
+    }
+    return result;
 }
 
 TEMP_matrix auto operator-(MAT_T lhs, Vector<Arithmetic, cols> &rhs)
 {
-    return lhs -= rhs;
+    MAT_T result;
+    for (size_t i = 0; i < rows; i++)
+    {
+        result.rowVectors[i] = lhs.rowVectors[i] - rhs;
+    }
+    return result;
 }
 
 TEMP_matrix auto
 operator*(MAT_T lhs, MAT_T &rhs)
 {
-    return lhs *= rhs;
+    MAT_T result;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            result.arr[row][col] = lhs.arr[row][col] * rhs.arr[row][col];
+        }
+    }
+    return result;
 }
 
 TEMP_matrix auto operator*(MAT_T lhs, Arithmetic rhs)
 {
-    return lhs *= rhs;
+    MAT_T result;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            result.arr[row][col] = lhs.arr[row][col] * rhs;
+        }
+    }
+    return result;
 }
 
 TEMP_matrix auto operator*(MAT_T lhs, Vector<Arithmetic, cols> &rhs)
 {
-    return lhs *= rhs;
+    MAT_T result;
+    for (size_t i = 0; i < rows; i++)
+    {
+        result.rowVectors[i] = lhs.rowVectors[i] * rhs;
+    }
+    return result;
 }
 
 TEMP_matrix auto
 operator/(MAT_T lhs, MAT_T &rhs)
 {
-    return lhs /= rhs;
+    MAT_T result;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            result.arr[row][col] = lhs.arr[row][col] / rhs.arr[row][col];
+        }
+    }
+    return result;
 }
 
 TEMP_matrix auto operator/(MAT_T lhs, Arithmetic rhs)
 {
-    return lhs /= rhs;
+    MAT_T result;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            result.arr[row][col] = lhs.arr[row][col] / rhs;
+        }
+    }
+    return result;
 }
 
 TEMP_matrix auto operator/(MAT_T lhs, Vector<Arithmetic, cols> &rhs)
 {
-    return lhs /= rhs;
+    MAT_T result;
+    for (size_t i = 0; i < rows; i++)
+    {
+        result.rowVectors[i] = lhs.rowVectors[i] / rhs;
+    }
+    return result;
 }
 
 template <typename Arithmetic, size_t dim, typename isArithmetic>
@@ -471,6 +559,71 @@ auto Vector<Arithmetic, dim, isArithmetic>::rowTimesCol(Vector<Arithmetic, dim2>
         rhs.arr[0][col] = vec.data[col];
     }
     return lhs.mul(rhs);
+}
+
+TEMP_matrix static void getCfactor(Arithmetic M[rows][cols], Arithmetic t[rows - 1][cols - 1], size_t p, size_t q)
+{
+    static_assert(rows == cols, "Not a square matrix");
+    int n = rows;
+    int i = 0, j = 0;
+    for (int r = 0; r < n; r++)
+    {
+        for (int c = 0; c < n; c++) //Copy only those elements which are not in given row r and column c: {
+            if (r != p && c != q)
+            {
+                t[i][j++] = M[r][c]; //If row is filled increase r index and reset c index
+                if (j == n - 1)
+                {
+                    j = 0;
+                    i++;
+                }
+            }
+    }
+}
+
+MAT_FUN(cof, (size_t p, size_t q))
+{
+    Matrix<Arithmetic, rows - 1, cols - 1> cofactor;
+    getCfactor<Arithmetic, rows, cols>(this->arr, cofactor.arr, p, q);
+    return cofactor;
+}
+
+MAT_FUN(adjoint, ())
+{
+    Matrix<Arithmetic, rows, cols> adj;
+    Arithmetic sign = 1;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            adj.arr[row][col] = sign * this->cof(row, col).determinant();
+            sign = - sign;
+        }
+    }
+    return adj;
+}
+
+MAT_FUN(inverse, ())
+{
+    Arithmetic det = this->determinant();
+
+    assert(det != 0);
+
+    return this->adjoint().transpose() * (1 / det);
+}
+
+
+MAT_FUN(toFloat, ())
+{
+    Matrix<float, rows, cols> fm;
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            fm.arr[row][col] = this->arr[row][col];
+        }
+    }
+    return fm;
 }
 
 } // namespace Math

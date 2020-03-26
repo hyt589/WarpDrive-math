@@ -173,13 +173,14 @@ int main(int argc, char const *argv[])
     mat1.arr[2][1] = 8;
     mat1.arr[2][2] = 8;
 
-    vec3f v1 = Vec3f(1.0f, 0.0f, 0.0f);
-    vec3f v2 = Vec3f(0.0f, 1.0f, 0.0f);
-    vec3i v3 = v1.toInt();
-    auto mat2 = mat1.mul(v3);
-    std::cout << mat2.toString() << "\n";
-    Matrix<int, 2, 2> mat3((int[2][2]){{1, 2},
-                                       {3, 4}});
-    std::cout << mat3.toString() << "\n";
+    // vec3f v1 = Vec3f(1.0f, 0.0f, 0.0f);
+    // vec3f v2 = Vec3f(0.0f, 1.0f, 0.0f);
+    // vec3i v3 = v1.toInt();
+    // auto mat2 = mat1 + v3;
+    // std::cout << mat2.toString() << "\n";
+    // Matrix<int, 2, 2> mat3((int[2][2]){{1, 2},
+    //                                    {3, 4}});
+    std::cout << mat1.toString() << "\n";
+    std::cout << mat1.toFloat().inverse().toString() << "\n";
     return 0;
 }
