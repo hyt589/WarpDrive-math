@@ -101,12 +101,6 @@ struct Matrix : public ProtoMatrix<Arithmetic, rows, cols, isArithmetic>
     auto toFloat();
 };
 
-template <typename Arithmetic, size_t rows, size_t cols = rows,
-          typename isArithmetic = Arithmetic>
-struct SquareMatrix : Matrix<Arithmetic, rows, cols, isArithmetic>
-{
-    static_assert(rows == cols, "SquareMatrix must have equal rows and cols!");
-};
 
 TEMP_matrix auto operator+(MAT_T lhs, MAT_T &rhs);
 TEMP_matrix auto operator+(MAT_T lhs, Arithmetic rhs);
@@ -394,7 +388,7 @@ MAT_FUN(mul, (Vector<Arithmetic, cols> & rhs))
         rmatrix.arr[0][i] = rhs.data[i];
     }
 
-    return this->mul(rmatrix);
+    return this->mul(rmatrix).colVector(0);
 }
 
 TEMP_matrix auto operator+(MAT_T lhs, MAT_T &rhs)
