@@ -104,22 +104,18 @@ struct SquareMatrix : Matrix<Arithmetic, rows, cols, isArithmetic>
 
 TEMP_matrix auto operator+(MAT_T lhs, MAT_T &rhs);
 TEMP_matrix auto operator+(MAT_T lhs, Arithmetic rhs);
-TEMP_matrix auto operator+(MAT_T lhs, Vector<Arithmetic, rows> &rhs);
 TEMP_matrix auto operator+(MAT_T lhs, Vector<Arithmetic, cols> &rhs);
 
 TEMP_matrix auto operator-(MAT_T lhs, MAT_T &rhs);
 TEMP_matrix auto operator-(MAT_T lhs, Arithmetic rhs);
-TEMP_matrix auto operator-(MAT_T lhs, Vector<Arithmetic, rows> &rhs);
 TEMP_matrix auto operator-(MAT_T lhs, Vector<Arithmetic, cols> &rhs);
 
 TEMP_matrix auto operator*(MAT_T lhs, MAT_T &rhs);
 TEMP_matrix auto operator*(MAT_T lhs, Arithmetic rhs);
-TEMP_matrix auto operator*(MAT_T lhs, Vector<Arithmetic, rows> &rhs);
 TEMP_matrix auto operator*(MAT_T lhs, Vector<Arithmetic, cols> &rhs);
 
 TEMP_matrix auto operator/(MAT_T lhs, MAT_T &rhs);
 TEMP_matrix auto operator/(MAT_T lhs, Arithmetic rhs);
-TEMP_matrix auto operator/(MAT_T lhs, Vector<Arithmetic, rows> &rhs);
 TEMP_matrix auto operator/(MAT_T lhs, Vector<Arithmetic, cols> &rhs);
 
 } // namespace Math
@@ -401,8 +397,29 @@ TEMP_matrix auto operator+(MAT_T lhs, MAT_T &rhs)
     return lhs += rhs;
 }
 
+TEMP_matrix auto operator+(MAT_T lhs, Arithmetic rhs)
+{
+    return lhs += rhs;
+}
+
+TEMP_matrix auto operator+(MAT_T lhs, Vector<Arithmetic, cols> &rhs)
+{
+    return lhs += rhs;
+}
+
+
 TEMP_matrix auto
 operator-(MAT_T lhs, MAT_T &rhs)
+{
+    return lhs -= rhs;
+}
+
+TEMP_matrix auto operator-(MAT_T lhs, Arithmetic rhs)
+{
+    return lhs -= rhs;
+}
+
+TEMP_matrix auto operator-(MAT_T lhs, Vector<Arithmetic, cols> &rhs)
 {
     return lhs -= rhs;
 }
@@ -413,8 +430,28 @@ operator*(MAT_T lhs, MAT_T &rhs)
     return lhs *= rhs;
 }
 
+TEMP_matrix auto operator*(MAT_T lhs, Arithmetic rhs)
+{
+    return lhs *= rhs;
+}
+
+TEMP_matrix auto operator*(MAT_T lhs, Vector<Arithmetic, cols> &rhs)
+{
+    return lhs *= rhs;
+}
+
 TEMP_matrix auto
 operator/(MAT_T lhs, MAT_T &rhs)
+{
+    return lhs /= rhs;
+}
+
+TEMP_matrix auto operator/(MAT_T lhs, Arithmetic rhs)
+{
+    return lhs /= rhs;
+}
+
+TEMP_matrix auto operator/(MAT_T lhs, Vector<Arithmetic, cols> &rhs)
 {
     return lhs /= rhs;
 }
