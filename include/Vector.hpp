@@ -679,13 +679,11 @@ Vector<float, dim> Vector<Arithmetic, dim, isArithmetic>::toFloat()
 template <typename Arithmetic, size_t dim, typename isArithmetic>
 Vector<int, dim> Vector<Arithmetic, dim, isArithmetic>::toInt()
 {
-    int arr[dim];
+    Vector<int, dim> result;
     for (size_t i = 0; i < dim; i++)
     {
-        arr[i] = (int)this->data[i];
+        result.data[i] = (int)this->data[i];
     }
-    Vector<int, dim> result;
-    result.data = arr;
     return result;
 }
 

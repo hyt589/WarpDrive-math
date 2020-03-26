@@ -6,10 +6,6 @@
     template <typename Arithmetic, size_t rows, size_t cols, typename isArithmetic> \
     auto Matrix<Arithmetic, rows, cols, isArithmetic>::FUN_NAME __VA_ARGS__
 
-#define SQ_MAT_FUN(FUN_NAME, ...)                                                   \
-    template <typename Arithmetic, size_t rows, size_t cols, typename isArithmetic> \
-    auto SquareMatrix<Arithmetic, rows, cols, isArithmetic>::FUN_NAME __VA_ARGS__
-
 #define MAT_TMP_FUN(FUN_NAME, TMP, ...)                                             \
     template <typename Arithmetic, size_t rows, size_t cols, typename isArithmetic> \
     TMP auto Matrix<Arithmetic, rows, cols, isArithmetic>::FUN_NAME __VA_ARGS__
@@ -49,6 +45,15 @@ struct ProtoMatrix
     };
 
     ProtoMatrix(){};
+    ProtoMatrix(Arithmetic data[rows][cols]){
+        for (size_t row = 0; row < rows; row++)
+        {
+            for (size_t col = 0; col < cols; col++)
+            {
+                this->arr[row][col] = data[row][col];
+            }
+        }
+    }
 };
 
 template <typename Arithmetic, size_t rows, size_t cols, typename isArithmetic = Arithmetic>
@@ -56,19 +61,38 @@ struct Matrix : public ProtoMatrix<Arithmetic, rows, cols, isArithmetic>
 {
     static_assert(rows >= 1 && cols >= 1, "Matrix size must be larger that 1x1");
     Matrix(){};
+    Matrix(Arithmetic data[rows][cols]) : ProtoMatrix<Arithmetic, rows, cols, isArithmetic>(data) {};
     auto colVector(int col);
     auto toString();
 
     auto determinant();
     auto transpose();
 
-    auto operator+=(MAT_T &rhs); //return reference to this
-    auto operator-=(MAT_T &rhs); //return reference to this
-    auto operator*=(MAT_T &rhs); //return reference to this
-    auto operator/=(MAT_T &rhs); //return reference to this
+    auto operator+=(MAT_T &rhs);     //return reference to this
+    auto operator+=(Arithmetic rhs); //return reference to this
+
+    auto operator+=(Vector<Arithmetic, cols> &rhs); //return reference to this
+
+    auto operator-=(MAT_T &rhs);     //return reference to this
+    auto operator-=(Arithmetic rhs); //return reference to this
+
+    auto operator-=(Vector<Arithmetic, cols> &rhs); //return reference to this
+
+    auto operator*=(MAT_T &rhs);     //return reference to this
+    auto operator*=(Arithmetic rhs); //return reference to this
+
+    auto operator*=(Vector<Arithmetic, cols> &rhs); //return reference to this
+
+    auto operator/=(MAT_T &rhs);     //return reference to this
+    auto operator/=(Arithmetic rhs); //return reference to this
+
+    auto operator/=(Vector<Arithmetic, cols> &rhs); //return reference to this
+
     auto operator[](int i);
 
+
     TEMP_mat_mul auto mul(Matrix<Arithmetic, cols, newCols> &rhs);
+    auto mul(Vector<Arithmetic, cols> &rhs);
 };
 
 template <typename Arithmetic, size_t rows, size_t cols = rows,
@@ -79,12 +103,24 @@ struct SquareMatrix : Matrix<Arithmetic, rows, cols, isArithmetic>
 };
 
 TEMP_matrix auto operator+(MAT_T lhs, MAT_T &rhs);
+TEMP_matrix auto operator+(MAT_T lhs, Arithmetic rhs);
+TEMP_matrix auto operator+(MAT_T lhs, Vector<Arithmetic, rows> &rhs);
+TEMP_matrix auto operator+(MAT_T lhs, Vector<Arithmetic, cols> &rhs);
 
 TEMP_matrix auto operator-(MAT_T lhs, MAT_T &rhs);
+TEMP_matrix auto operator-(MAT_T lhs, Arithmetic rhs);
+TEMP_matrix auto operator-(MAT_T lhs, Vector<Arithmetic, rows> &rhs);
+TEMP_matrix auto operator-(MAT_T lhs, Vector<Arithmetic, cols> &rhs);
 
 TEMP_matrix auto operator*(MAT_T lhs, MAT_T &rhs);
+TEMP_matrix auto operator*(MAT_T lhs, Arithmetic rhs);
+TEMP_matrix auto operator*(MAT_T lhs, Vector<Arithmetic, rows> &rhs);
+TEMP_matrix auto operator*(MAT_T lhs, Vector<Arithmetic, cols> &rhs);
 
 TEMP_matrix auto operator/(MAT_T lhs, MAT_T &rhs);
+TEMP_matrix auto operator/(MAT_T lhs, Arithmetic rhs);
+TEMP_matrix auto operator/(MAT_T lhs, Vector<Arithmetic, rows> &rhs);
+TEMP_matrix auto operator/(MAT_T lhs, Vector<Arithmetic, cols> &rhs);
 
 } // namespace Math
 
@@ -132,35 +168,42 @@ MAT_FUN(toString, ())
     return s;
 }
 
-
 //private helper function to perform LU decomposition
 template <typename T, size_t n>
-static void LUdecomposition(T a[n][n], T l[n][n], T u[n][n]) {
-   int i = 0, j = 0, k = 0;
-   for (i = 0; i < n; i++) {
-      for (j = 0; j < n; j++) {
-         if (j < i)
-         l[j][i] = 0;
-         else {
-            l[j][i] = a[j][i];
-            for (k = 0; k < i; k++) {
-               l[j][i] = l[j][i] - l[j][k] * u[k][i];
+static void LUdecomposition(T a[n][n], T l[n][n], T u[n][n])
+{
+    int i = 0, j = 0, k = 0;
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            if (j < i)
+                l[j][i] = 0;
+            else
+            {
+                l[j][i] = a[j][i];
+                for (k = 0; k < i; k++)
+                {
+                    l[j][i] = l[j][i] - l[j][k] * u[k][i];
+                }
             }
-         }
-      }
-      for (j = 0; j < n; j++) {
-         if (j < i)
-            u[i][j] = 0;
-         else if (j == i)
-            u[i][j] = 1;
-         else {
-            u[i][j] = a[i][j] / l[i][i];
-            for (k = 0; k < i; k++) {
-               u[i][j] = u[i][j] - ((l[i][k] * u[k][j]) / l[i][i]);
+        }
+        for (j = 0; j < n; j++)
+        {
+            if (j < i)
+                u[i][j] = 0;
+            else if (j == i)
+                u[i][j] = 1;
+            else
+            {
+                u[i][j] = a[i][j] / l[i][i];
+                for (k = 0; k < i; k++)
+                {
+                    u[i][j] = u[i][j] - ((l[i][k] * u[k][j]) / l[i][i]);
+                }
             }
-         }
-      }
-   }
+        }
+    }
 }
 
 MAT_FUN(determinant, ())
@@ -169,7 +212,7 @@ MAT_FUN(determinant, ())
     Arithmetic l[cols][cols];
     Arithmetic u[cols][cols];
 
-    LUdecomposition(this->arr,l,u);
+    LUdecomposition(this->arr, l, u);
     Arithmetic detL = 1;
     Arithmetic detU = 1;
     for (size_t i = 0; i < cols; i++)
@@ -190,7 +233,6 @@ MAT_FUN(transpose, ())
     return result;
 }
 
-
 MAT_FUN(operator+=,(MAT_T &rhs))
 {
     for (size_t row = 0; row < rows; row++)
@@ -199,6 +241,27 @@ MAT_FUN(operator+=,(MAT_T &rhs))
         {
             this->arr[row][col] += rhs.arr[row][col];
         }
+    }
+    return *this;
+}
+
+MAT_FUN(operator+=,(Arithmetic rhs))
+{
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            this->arr[row][col] += rhs;
+        }
+    }
+    return *this;
+}
+
+MAT_FUN(operator+=,(Vector<Arithmetic, cols> &rhs))
+{
+    for (size_t i = 0; i < rows; i++)
+    {
+        this->rowVectors[i] += rhs;
     }
     return *this;
 }
@@ -215,6 +278,27 @@ MAT_FUN(operator-=,(MAT_T &rhs))
     return *this;
 }
 
+MAT_FUN(operator-=,(Arithmetic rhs))
+{
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            this->arr[row][col] -= rhs;
+        }
+    }
+    return *this;
+}
+
+MAT_FUN(operator-=,(Vector<Arithmetic, cols> &rhs))
+{
+    for (size_t i = 0; i < rows; i++)
+    {
+        this->rowVectors[i] -= rhs;
+    }
+    return *this;
+}
+
 MAT_FUN(operator/=,(MAT_T &rhs))
 {
     for (size_t row = 0; row < rows; row++)
@@ -222,6 +306,27 @@ MAT_FUN(operator/=,(MAT_T &rhs))
         for (size_t col = 0; col < cols; col++)
         {
             this->arr[row][col] /= rhs.arr[row][col];
+        }
+    }
+    return *this;
+}
+
+MAT_FUN(operator/=,(Vector<Arithmetic, cols> &rhs))
+{
+    for (size_t i = 0; i < rows; i++)
+    {
+        this->rowVectors[i] /= rhs;
+    }
+    return *this;
+}
+
+MAT_FUN(operator/=,(Arithmetic rhs))
+{
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            this->arr[row][col] /= rhs;
         }
     }
     return *this;
@@ -235,6 +340,27 @@ MAT_FUN(operator*=,(MAT_T &rhs))
         {
             this->arr[row][col] *= rhs.arr[row][col];
         }
+    }
+    return *this;
+}
+
+MAT_FUN(operator*=,(Arithmetic rhs))
+{
+    for (size_t row = 0; row < rows; row++)
+    {
+        for (size_t col = 0; col < cols; col++)
+        {
+            this->arr[row][col] *= rhs;
+        }
+    }
+    return *this;
+}
+
+MAT_FUN(operator*=,(Vector<Arithmetic, cols> &rhs))
+{
+    for (size_t i = 0; i < rows; i++)
+    {
+        this->rowVectors[i] *= rhs;
     }
     return *this;
 }
@@ -257,6 +383,18 @@ MAT_TMP_FUN(mul, TEMP_mat_mul, (Matrix<Arithmetic, cols, newCols> & rhs))
     }
     return result;
 }
+
+MAT_FUN(mul, (Vector<Arithmetic, cols> &rhs ))
+{
+    Matrix<Arithmetic, cols, 1> rmatrix;
+    for (size_t i = 0; i < cols; i++)
+    {
+        rmatrix.arr[0][i] = rhs.data[i];
+    }
+    
+    return this->mul(rmatrix);
+}
+
 
 TEMP_matrix auto operator+(MAT_T lhs, MAT_T &rhs)
 {

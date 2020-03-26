@@ -172,11 +172,14 @@ int main(int argc, char const *argv[])
     mat1.arr[2][0] = 7;
     mat1.arr[2][1] = 8;
     mat1.arr[2][2] = 8;
-    
+
     vec3f v1 = Vec3f(1.0f, 0.0f, 0.0f);
     vec3f v2 = Vec3f(0.0f, 1.0f, 0.0f);
-    vec3f v3 = cross(v1,v2);
-    std::cout << v3;
-    
+    vec3i v3 = v1.toInt();
+    auto mat2 = mat1.mul(v3);
+    std::cout << mat2.toString() << "\n";
+    Matrix<int, 2, 2> mat3((int[2][2]){{1, 2},
+                                       {3, 4}});
+    std::cout << mat3.toString() << "\n";
     return 0;
 }
