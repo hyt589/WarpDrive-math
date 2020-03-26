@@ -22,3 +22,25 @@ CMake -G <build option> -DCMAKE_BUILD_TYPE=<build type> path/to/CMakeList.txt
 where build option is dependent on your OS. On Windows PC this is `"Visual Studio 15 2017"`; on Unix based system (eg. OS X and Linux) this is `"Unix Makefiles"`.
 
 If you generated with the `"Visual Studio 15 2017"` option, this will generate a `.sln` solution file, which can be imported to Microsoft Visual Studio IDE. If you are on Mac or Linux, this will generate  a `makefile`, which will allow you to build the project by invoking the command `make`.
+
+# Features
+
+## Vectors
+
+* Element wise arithmetic;
+* dot product;
+* cross product;
+* scalar arithmetic;
+* 2-4 dimensional specialization;
+
+## Matrix
+
+* Element wise arithmetic;
+* matrix multiplication;
+* determinants of square matrices;
+* adjoint, cofactor and inverse;
+  
+# Planned
+
+* Constructor for 3D translation, rotation and projection matrices;
+* quaternion implementations.

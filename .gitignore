@@ -1,0 +1,11 @@
+*
+!.vscode
+!.vscode/**
+!include
+!include/**
+!src
+!src/**
+!*.cpp
+!CMakeLists.txt
+!README.md
+!.gitignore
